@@ -615,7 +615,7 @@ Fields not implemented:
         abstract = True
 
     stripe_api_name = "Customer"
-    expand_fields = ["default_source"]<
+    expand_fields = ["default_source"]
 
     account_balance = StripeIntegerField(
         null=True,
