@@ -309,6 +309,7 @@ class StripeObject(TimeStampedModel):
         """
         Search the given manager for the Invoice matching this StripeCharge object's ``invoice`` field.
         Note that the invoice field is required.
+        Note that the invoice field is required.
 
         :param target_cls: The target class
         :type target_cls: StripeInvoice
@@ -614,7 +615,7 @@ Fields not implemented:
         abstract = True
 
     stripe_api_name = "Customer"
-    expand_fields = ["default_source"]
+    expand_fields = ["default_source"]<
 
     account_balance = StripeIntegerField(
         null=True,
@@ -728,6 +729,8 @@ Fields not implemented:
     def charge(self, amount, currency, application_fee=None, capture=None, description=None, destination=None,
                metadata=None, shipping=None, source=None, statement_descriptor=None, stripe_account=None,
                idempotency_key=None):
+        # TK added stripe_account=None
+
         """
         Creates a charge for this customer.
 
@@ -846,7 +849,7 @@ Fields not implemented:
 
         return stripe_invoiceitem
 
-    def add_card(self, source, set_default=True):
+    def add_card(self, source, set_default=True, api_key=settings.STRIPE_SECRET_KEY):
         """
         Adds a card to this customer's account.
 
@@ -858,7 +861,7 @@ Fields not implemented:
 
         """
 
-        stripe_customer = self.api_retrieve()
+        stripe_customer = self.api_retrieve(api_key)
         stripe_card = stripe_customer.sources.create(source=source)
 
         if set_default:
