@@ -834,7 +834,7 @@ Fields not implemented:
 
         return stripe_invoiceitem
 
-    def add_card(self, source, set_default=True, api_key=settings.STRIPE_SECRET_KEY):
+    def add_card(self, source, set_default=True, api_key=djstripe_settings.STRIPE_SECRET_KEY):
         """
         Adds a card to this customer's account.
 
