@@ -210,7 +210,7 @@ Use ``Customer.sources`` and ``Customer.subscriptions`` to access them.
         stripe_customer = cls._api_create(
             email=subscriber.email,
             idempotency_key=idempotency_key,
-            metadata={cls.djstripe_subscriber_key: subscriber.pk}
+            metadata={cls.djstripe_subscriber_key: subscriber.pk},
             **optional
             )
         customer, created = Customer.objects.get_or_create(
