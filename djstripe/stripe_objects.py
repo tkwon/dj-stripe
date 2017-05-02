@@ -838,7 +838,7 @@ Fields not implemented:
 
         return stripe_invoiceitem
 
-    def add_card(self, source, set_default=True, api_key=djstripe_settings.STRIPE_SECRET_KEY):
+    def add_card(self, source, stripe_account=None, set_default=True, api_key=djstripe_settings.STRIPE_SECRET_KEY):
         """
         Adds a card to this customer's account.
 
@@ -850,7 +850,11 @@ Fields not implemented:
 
         """
 
-        stripe_customer = self.api_retrieve(api_key)
+        if stripe_account == None:
+            stripe_customer = self.api_retrieve(api_key)
+        else:
+            stripe_customer = stripe.Customer.retrieve(self.stripe_id, stripe_account=stripe_account)
+
         stripe_card = stripe_customer.sources.create(source=source)
 
         if set_default:
