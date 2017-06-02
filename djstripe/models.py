@@ -210,9 +210,11 @@ Use ``Customer.sources`` and ``Customer.subscriptions`` to access them.
 
     @classmethod
     def create(cls, subscriber, account=None, idempotency_key=None):
+        # this was removed or non existent in kavdev version
         trial_days = None
         if djstripe_settings.trial_period_for_subscriber_callback:
             trial_days = djstripe_settings.trial_period_for_subscriber_callback(subscriber)
+        # did we add it?
 
         optional = dict()
         if account is not None:
