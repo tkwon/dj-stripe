@@ -408,8 +408,10 @@ Use ``Customer.sources`` and ``Customer.subscriptions`` to access them.
         """ Check whether the customer has a valid payment source."""
         return self.default_source is not None
 
-    def add_card(self, source, stripe_account=None, set_default=True, api_key=djstripe_settings.STRIPE_SECRET_KEY):
-        new_stripe_card = super(Customer, self).add_card(source, stripe_account, set_default, api_key)
+    def add_card(self, source, set_default=True, **kwargs):
+        if 'stripe_account' not in kwargs and self.account and self.account.stripe_id:
+            kwargs['stripe_account'] = self.account.stripe_id
+        new_stripe_card = super(Customer, self).add_card(source, set_default, **kwargs)
         new_card = Card.sync_from_stripe_data(new_stripe_card)
 
         # Change the default source
