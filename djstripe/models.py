@@ -210,7 +210,6 @@ Use ``Customer.sources`` and ``Customer.subscriptions`` to access them.
 
     @classmethod
     def create(cls, subscriber, account=None, idempotency_key=None):
-
         optional = dict()
         if account is not None:
             optional['stripe_account'] = account.stripe_id
@@ -220,7 +219,7 @@ Use ``Customer.sources`` and ``Customer.subscriptions`` to access them.
             idempotency_key=idempotency_key,
             metadata={cls.djstripe_subscriber_key: subscriber.pk},
             **optional
-            )
+        )
         customer, created = Customer.objects.get_or_create(
             stripe_id=stripe_customer["id"],
             account=account,
