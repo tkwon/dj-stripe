@@ -12,11 +12,13 @@
 from __future__ import unicode_literals
 
 import logging
+import traceback
 import uuid
 import sys
 from datetime import timedelta
 
 from django.core.exceptions import ValidationError
+from django.core.mail import mail_admins
 from django.db import models
 from django.db.models.fields import (
     BooleanField, CharField, DateTimeField, NullBooleanField, TextField, UUIDField
@@ -202,12 +204,29 @@ Use ``Customer.sources`` and ``Customer.subscriptions`` to access them.
         :type livemode: bool
         """
 
-        try:
-            return Customer.objects.get(subscriber=subscriber, account=account, livemode=livemode), False
-        except Customer.DoesNotExist:
-            action = "create:{}".format(subscriber.pk)
-            idempotency_key = djstripe_settings.get_idempotency_key("customer", action, livemode)
-            return cls.create(subscriber, account, idempotency_key=idempotency_key), True
+        customers = Customer.objects.filter(subscriber=subscriber, account=account, livemode=livemode)
+        count = customers.count()
+        if count > 1:
+            # report about issue to administrators
+            params = dict(
+                subscriber=subscriber.id,
+                account=account and account.id,
+                livemode=livemode
+            )
+            lines = ['Input parameters:']
+            lines.extend(map('{0[0]}={0[1]}'.format, params.items()))
+            lines.append('\nDuplicate records:\nCustomer ID, Stripe ID')
+            lines.extend(map('{0[0]}, {0[1]}'.format, customers.values_list('id','stripe_id')))
+            lines.append('\nStacktrace:')
+            lines.extend(traceback.format_stack()[:-1])
+            mail_admins('dj-stripe customer duplicates are found', '\n'.join(lines))
+
+        if count > 0:
+            return customers.first(), False
+
+        action = "create:{}".format(subscriber.pk)
+        idempotency_key = djstripe_settings.get_idempotency_key("customer", action, livemode)
+        return cls.create(subscriber, account, idempotency_key=idempotency_key), True
 
     @classmethod
     def create(cls, subscriber, account=None, idempotency_key=None):
