@@ -205,7 +205,9 @@ def subscription_status(customer):
 
     If the customer does not have a subscription, an empty string is returned.
     """
-    if customer.subscription:
+    if customer.subscriptions.count() > 1:
+        return "Multiple"
+    elif customer.subscription:
         return customer.subscription.status
     else:
         return ""
