@@ -944,7 +944,9 @@ Fields not implemented:
         # Stripe API version validation is bypassed because we assume what
         # Stripe passes us is a sane and usable value.
         with stripe_temporary_api_version(api_version, validate=False):
-            stripe_event = super(StripeEvent, self).api_retrieve(api_key)
+            # Determine if this is a Stripe Connect event
+            stripe_account = self.data.get('account', None)
+            stripe_event = super(StripeEvent, self).api_retrieve(api_key, stripe_account)
 
         return stripe_event
 
