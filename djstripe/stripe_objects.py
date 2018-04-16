@@ -945,7 +945,7 @@ Fields not implemented:
         # Stripe passes us is a sane and usable value.
         with stripe_temporary_api_version(api_version, validate=False):
             # Determine if this is a Stripe Connect event
-            stripe_account = self.data.get('account', None)
+            stripe_account = self.webhook_message.get('account', None)
             stripe_event = super(StripeEvent, self).api_retrieve(api_key, stripe_account)
 
         return stripe_event
